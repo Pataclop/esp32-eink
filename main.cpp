@@ -277,7 +277,7 @@ void setup()
 	delay(1000);
 
 	Serial.begin(9600);
-	Serial.println("BIP BOUP");
+	Serial.println("BIP BOUPS");
 	delay(3000);
 	WiFi.begin(ssid, password);
 	delay(1000);
@@ -285,7 +285,7 @@ void setup()
 	while (WiFi.status() != WL_CONNECTED)
 	{
 		delay(1000);
-		Serial.println("Connecting to WiFi..");
+		Serial.println("Connecting to WiFi.. ?");
 		FullText("OOO");
 	}
 
@@ -299,6 +299,8 @@ void loop()
 {
 
 	cmp++;
+	Serial.println(cmp);
+
 	display.powerOff();
 	if (cmp == 30)
 	{
@@ -306,11 +308,11 @@ void loop()
 		clean();
 	}
 	int change = 0;
-
+	buttonState = LOW;
 	for (int i = 0; i < 500; i++)
 	{
 		delay(4);
-		buttonState = LOW;
+		
 		buttonState = digitalRead(buttonPin);
 
 		if (buttonState == HIGH)
@@ -318,7 +320,7 @@ void loop()
 			change++;
 		}
 	}
-
+	buttonState = LOW;
 	if (change > 0)
 	{
 		
@@ -327,7 +329,7 @@ void loop()
 	}
 	Serial.println("MODE  ");
 
-		Serial.print(mode);
+		Serial.print("mode" + mode);
 	if (mode >= 2)
 		mode = 0;
 	if (mode == 0){
