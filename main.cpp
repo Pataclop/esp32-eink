@@ -25,7 +25,7 @@ GxEPD2_BW<GxEPD2_420, GxEPD2_420::HEIGHT> display(GxEPD2_420(/*CS=5*/ SS, /*DC=*
 
 #endif
 const char *ssid = "openplotter";
-const char *password = "12345678";
+const char *password = "freewifi";
 const char three[] = "123";
 const char seven[] = "0123456";
 const char tsleep[] = " ";
@@ -232,7 +232,7 @@ int getMagneticCourse()
 
 		HTTPClient http;
 
-		http.begin("http://10.10.10.1:3000/signalk/v1/api/vessels/self/navigation/courseOverGroundMagnetic/value"); //Specify the URL
+		http.begin("http://10.10.10.1:3000/signalk/v1/api/vessels/self/navigation/courseOverGroundTrue/value"); //Specify the URL
 		int httpCode = http.GET();																					//Make the request
 
 		if (httpCode > 0)
@@ -251,6 +251,8 @@ int getMagneticCourse()
 			strcpy(char_array, payload.c_str());
 			http.end(); //Free the resources
       float value = (atof(char_array)*57.2958);
+	  Serial.println(atof(char_array));
+	  Serial.println(atof(char_array)*57.2958);
 			return ((int)value);
 		}
 
@@ -327,7 +329,6 @@ void loop()
 		mode = mode + 1;
 		change = 0;
 	}
-	Serial.println("MODE  ");
 
 		Serial.print("mode" + mode);
 	if (mode >= 2)
