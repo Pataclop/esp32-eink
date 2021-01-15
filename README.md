@@ -6,3 +6,4 @@ This project uses a 4.2" E-inl diplay and an ESP32 to display informations, espe
 
 [Video of the display](https://www.youtube.com/watch?v=_f7zujoYDNE&feature=youtu.be)
 
+![Wiring](https://github.com/Pataclop/esp32-eink/blob/main/wiring.jpg)
