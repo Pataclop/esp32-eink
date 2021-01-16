@@ -269,7 +269,7 @@ int getMagneticCourse()
 
 void setup()
 {
-	
+	setCpuFrequencyMhz(80);
 	display.init(115200);
 	pinMode(buttonPin, INPUT);
 
