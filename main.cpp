@@ -35,39 +35,10 @@ int buttonState = 0;	  // variable for reading the pushbutton status
 int cmp = 0;
 
 int mode = 0;
-
-void clean()
-{
-	//Serial.println("clean");
-	display.setRotation(0);
-	display.setFont(&FreeSansBold50pt7b);
-	display.setTextColor(GxEPD_BLACK);
-	delay(1000);
-	int16_t tbx, tby;
-	uint16_t tbw, tbh;
-	display.getTextBounds(tsleep, 0, 0, &tbx, &tby, &tbw, &tbh);
-	// center bounding box by transposition of origin:
-	uint16_t x = ((display.width() - tbw) / 2) - tbx;
-	uint16_t y = ((display.height() - tbh) / 2) - tby;
-	display.setFullWindow();
-	display.firstPage();
-	do
-	{
-		display.fillScreen(GxEPD_WHITE);
-		delay(1000);
-		display.fillScreen(GxEPD_BLACK);
-		delay(1000);
-		display.fillScreen(GxEPD_WHITE);
-		delay(1000);
-		display.setCursor(x, y);
-		display.print(tsleep);
-	} while (display.nextPage());
-	//Serial.println("clean done");
-}
+int oldmode=1;
 
 void dualScreen(int val1, int val2)
 {
-	//Serial.println("fullScreen");
 
 	display.setPartialWindow(0, 0, display.width(), 3*display.height()/4);
 	display.setRotation(0);
@@ -97,12 +68,10 @@ void dualScreen(int val1, int val2)
 		display.print(val1);
 
 	} while (display.nextPage());
-	//Serial.println("fullScreen done");
 }
 
 void dualText(String str1, String str2)
 {
-	//Serial.println("fullScreen");
 
 	display.setPartialWindow(0, 3*display.height()/4, display.width(), display.height());
 	display.setRotation(0);
@@ -132,7 +101,6 @@ void dualText(String str1, String str2)
 		display.print(str1);
 
 	} while (display.nextPage());
-	//Serial.println("fullScreen done");
 }
 
 void fullScreen(int value)
@@ -158,7 +126,6 @@ void fullScreen(int value)
 		display.setCursor(umx, umy);
 		display.print(value);
 	} while (display.nextPage());
-
 	
 }
 
@@ -200,8 +167,6 @@ int getSpeed()
 		{ //Check for the returning code
 
 			String payload = http.getString();
-			//Serial.println(httpCode);
-			Serial.println(payload);
 			int n = payload.length();
 
 			// declaring character array
@@ -216,7 +181,6 @@ int getSpeed()
 
 		else
 		{
-			Serial.println("Error on HTTP request");
 			return (-1);
 		}
 
@@ -239,8 +203,6 @@ int getMagneticCourse()
 		{ //Check for the returning code
 
 			String payload = http.getString();
-			//Serial.println(httpCode);
-			Serial.println(payload);
 			int n = payload.length();
 
 			// declaring character array
@@ -251,14 +213,11 @@ int getMagneticCourse()
 			strcpy(char_array, payload.c_str());
 			http.end(); //Free the resources
       float value = (atof(char_array)*57.2958);
-	  Serial.println(atof(char_array));
-	  Serial.println(atof(char_array)*57.2958);
 			return ((int)value);
 		}
 
 		else
 		{
-			Serial.println("Error on HTTP request");
 			return (-1);
 		}
 
@@ -269,76 +228,67 @@ int getMagneticCourse()
 
 void setup()
 {
+
+	//WiFi.setTxPower(WIFI_POWER_MINUS_1dBm);
+	
 	setCpuFrequencyMhz(80);
+
 	display.init(115200);
+
 	pinMode(buttonPin, INPUT);
 
-	clean();
+	display.clearScreen();
 	delay(1000);
-	clean();
+	display.clearScreen();
 	delay(1000);
 
-	Serial.begin(9600);
-	Serial.println("BIP BOUPS");
-	delay(3000);
 	WiFi.begin(ssid, password);
-	delay(1000);
-	FullText("XXX");
-	while (WiFi.status() != WL_CONNECTED)
-	{
-		delay(1000);
-		Serial.println("Connecting to WiFi.. ?");
-		FullText("OOO");
+	while (WiFi.status() != WL_CONNECTED) {
+		delay(100);
 	}
-
-	Serial.println("Connected to the WiFi network");
-	FullText("VVV");
-	// first update should be full refresh
-	delay(1000);
 }
 
 void loop()
 {
-
+	delay(2000);
 	cmp++;
-	Serial.println(cmp);
-
-	display.powerOff();
-	if (cmp == 30)
-	{
-		cmp = 0;
-		clean();
+	//esp_sleep_enable_timer_wakeup(2000000); //5 seconds
+    buttonState = LOW;
+	buttonState = digitalRead(buttonPin);
+	if (buttonState == HIGH){
+		mode = mode+1;
 	}
-	int change = 0;
+
 	buttonState = LOW;
-	for (int i = 0; i < 500; i++)
-	{
-		delay(4);
-		
-		buttonState = digitalRead(buttonPin);
-
-		if (buttonState == HIGH)
-		{
-			change++;
-		}
-	}
-	buttonState = LOW;
-	if (change > 0)
-	{
-		
-		mode = mode + 1;
-		change = 0;
-	}
-
-		Serial.print("mode" + mode);
+	//int ret = esp_light_sleep_start();
 	if (mode >= 2)
 		mode = 0;
 	if (mode == 0){
+		if (oldmode!=mode){
+			display.clearScreen();
+			delay(200);
+			FullText("NTS");
+		}
 		fullScreen(getSpeed());
-		FullText("NTS");
+		
 	}
+
+
 	if (mode == 1){
+		if (oldmode!=mode){
+			display.clearScreen();
+			delay(200);
+			dualText("NTS", "COG");
+		}
 		dualScreen(getSpeed(), getMagneticCourse());
-		dualText("NTS", "COG");
+		
 	}
+
+
+	if (cmp>30) {
+		cmp=0;
+		display.clearScreen();
+		delay(1000);
+	}
+	oldmode=mode;
 }
