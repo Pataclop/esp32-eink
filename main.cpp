@@ -8,6 +8,9 @@
 #include <Fonts/FreeMonoBoldOblique24pt7b.h>
 #include <Fonts/FreeSansBold50pt7b.h>
 #include <Fonts/FreeSansBold100pt7b.h>
+#include <esp_wifi.h>
+#include <esp_bt.h>
+#include <WiFi.h>
 
 //#include <Fonts/FAT.h>
 
@@ -252,7 +255,6 @@ void loop()
 {
 	delay(2000);
 	cmp++;
-	//esp_sleep_enable_timer_wakeup(2000000); //5 seconds
     buttonState = LOW;
 	buttonState = digitalRead(buttonPin);
 	if (buttonState == HIGH){
@@ -260,7 +262,6 @@ void loop()
 	}
 
 	buttonState = LOW;
-	//int ret = esp_light_sleep_start();
 	if (mode >= 2)
 		mode = 0;
 	if (mode == 0){
@@ -289,6 +290,10 @@ void loop()
 		cmp=0;
 		display.clearScreen();
 		delay(1000);
+
+		if (mode ==0) FullText("NTS");
+		if (mode == 1) dualText("NTS", "COG");
+		
 	}
 	oldmode=mode;
 }
